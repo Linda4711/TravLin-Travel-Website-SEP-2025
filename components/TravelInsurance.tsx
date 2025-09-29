@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { Card, CardContent } from './ui/card'
 import SectionDivider from './SectionDivider'
 import TravLinButton from './TravLinButton'
+import { toast } from 'sonner'
 
 export default function TravelInsurance() {
   const covermoreLink = "https://secure.covermore.com.au/agent/home.aspx?AlphaCode=CTV0181"
@@ -230,7 +231,28 @@ export default function TravelInsurance() {
               {/* Blue CALL Button - Last - WRAPPED TO TEXT WIDTH */}
               <div className="flex-shrink-0">
                 <button
-                  onClick={() => window.open(`tel:${phoneNumber}`, '_self')}
+                  onClick={() => {
+                    const tel = `tel:${phoneNumber}`;
+                    const displayNumber = '1300 72 88 22';
+                    
+                    // Try to open dialer first
+                    if (window.location.protocol === 'https:' || window.location.hostname === 'localhost') {
+                      window.location.href = tel;
+                    } else {
+                      // Fallback - copy number and show toast
+                      navigator.clipboard.writeText(displayNumber).then(() => {
+                        toast.success(`Phone number copied: ${displayNumber}`, {
+                          description: 'Medical assessment support - tap to call',
+                          duration: 5000
+                        });
+                      }).catch(() => {
+                        toast.success(`Call us: ${displayNumber}`, {
+                          description: 'Medical assessment support',
+                          duration: 5000
+                        });
+                      });
+                    }
+                  }}
                   className="text-white shadow-lg hover:opacity-90 transition-all duration-300"
                   style={{
                     borderRadius: '4px',
