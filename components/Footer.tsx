@@ -66,9 +66,20 @@ export default function Footer({ onContactClick, onNavigateToServices, onNavigat
       } else {
         // Real EmailJS implementation
         const templateParams = {
+          from_name: 'Newsletter Subscriber',
+          from_email: footerEmail,
+          message: `New newsletter subscription from footer on TravLin Travel website.
+          
+Email: ${footerEmail}
+Source: Footer Newsletter Signup
+Timestamp: ${new Date().toISOString()}
+          
+Please add this email to the newsletter mailing list for travel updates and special offers.`,
           subscriber_email: footerEmail,
           source: 'Footer Newsletter Signup',
-          timestamp: new Date().toISOString()
+          subscription_type: 'Newsletter',
+          timestamp: new Date().toISOString(),
+          to_email: 'hello@travlintravel.com.au'
         }
 
         await emailjs.send(serviceId, templateId, templateParams, publicKey)
