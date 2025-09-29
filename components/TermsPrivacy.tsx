@@ -104,14 +104,59 @@ export default function TermsPrivacy({ isOpen, onClose }: TermsPrivacyProps) {
       // Send email notification via EmailJS
       try {
         const emailParams = {
+          // Primary EmailJS fields
+          to_email: 'hello@travlintravel.com.au',
+          from_name: acceptanceData.customer.name,
+          from_email: acceptanceData.customer.email,
+          subject: `Customer Acceptance Received - ${acceptanceData.acceptance.acceptanceId}`,
+          
+          // Customer details
           customer_name: acceptanceData.customer.name,
+          customer_surname: acceptanceData.customer.name.split(' ').pop() || acceptanceData.customer.name, // Extract surname
+          customer_first_name: acceptanceData.customer.name.split(' ')[0] || acceptanceData.customer.name, // Extract first name
           customer_email: acceptanceData.customer.email,
-          customer_phone: acceptanceData.customer.phone,
-          business_name: acceptanceData.customer.businessName,
+          customer_phone: acceptanceData.customer.phone || 'Not provided',
+          business_name: acceptanceData.customer.businessName || 'Private Individual',
+          
+          // Acceptance details
           acceptance_id: acceptanceData.acceptance.acceptanceId,
+          acceptance_reference: acceptanceData.acceptance.acceptanceId,
           timestamp: acceptanceData.acceptance.timestamp,
           documents_accepted: acceptanceData.acceptance.documentsAccepted.join(', '),
-          user_agent: acceptanceData.acceptance.userAgent
+          user_agent: acceptanceData.acceptance.userAgent,
+          ip_address: acceptanceData.acceptance.ipAddress || 'Hidden for privacy',
+          
+          // Comprehensive message for email body
+          message: `NEW CUSTOMER ACCEPTANCE RECEIVED
+
+CUSTOMER DETAILS:
+Name: ${acceptanceData.customer.name}
+Surname: ${acceptanceData.customer.name.split(' ').pop() || acceptanceData.customer.name}
+Email: ${acceptanceData.customer.email}
+Phone: ${acceptanceData.customer.phone || 'Not provided'}
+Business: ${acceptanceData.customer.businessName || 'Private Individual'}
+Travel for Business: ${acceptanceData.customer.travelForBusiness ? 'Yes' : 'No'}
+
+ACCEPTANCE DETAILS:
+Acceptance Reference: ${acceptanceData.acceptance.acceptanceId}
+Timestamp: ${acceptanceData.acceptance.timestamp}
+Documents Accepted: ${acceptanceData.acceptance.documentsAccepted.join(', ')}
+IP Address: ${acceptanceData.acceptance.ipAddress || 'Hidden for privacy'}
+User Agent: ${acceptanceData.acceptance.userAgent}
+
+TERMS AND CONDITIONS ACCEPTED:
+${acceptanceData.acceptance.documentsAccepted.map(doc => `✓ ${doc}`).join('\n')}
+
+This customer has completed the legal acceptance process and can now proceed with bookings.`,
+          
+          // Additional template fields for backup
+          full_name: acceptanceData.customer.name,
+          email: acceptanceData.customer.email,
+          phone: acceptanceData.customer.phone || 'Not provided',
+          company: acceptanceData.customer.businessName || 'Private Individual',
+          reference_id: acceptanceData.acceptance.acceptanceId,
+          date_accepted: acceptanceData.acceptance.timestamp,
+          accepted_documents: acceptanceData.acceptance.documentsAccepted.join(', ')
         }
 
         await emailjs.send(
