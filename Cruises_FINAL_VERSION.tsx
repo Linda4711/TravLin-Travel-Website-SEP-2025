@@ -9,7 +9,7 @@ import { Button } from './components/ui/button'
 import { Input } from './components/ui/input'
 import { Checkbox } from './components/ui/checkbox'
 import { toast } from 'sonner'
-// import emailjs from '@emailjs/browser' // Removed for build compatibility
+import emailjs from '@emailjs/browser'
 import { 
   Ship, 
   Waves,
@@ -71,15 +71,21 @@ export default function Cruises({ onNavigateBack, onNavigateToContact, onNavigat
     setIsSubmitting(true)
     
     try {
-      // Mock email functionality - replace with real implementation when emailjs is available
-      console.log('AI subscription request:', {
-        email,
-        page: 'Cruises',
-        timestamp: new Date().toISOString()
-      })
+      // EmailJS Configuration - LIVE
+      const serviceId = 'service_rlnjyuj'
+      const templateId = 'template_aiumzob'
+      const publicKey = 'GY6ImN3fkI91A6mGw'
       
-      // Simulate async operation
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      const templateParams = {
+        from_name: 'AI Cruise Subscription',
+        from_email: email,
+        message: `New AI Cruise Planner subscription from ${email}. User wants to be notified when AI cruise planning feature becomes available.`,
+        to_email: 'hello@travlintravel.com.au'
+      }
+      
+      // Send email via EmailJS
+      await emailjs.send(serviceId, templateId, templateParams, publicKey)
+      console.log('✅ AI Cruise notification subscription sent via EmailJS')
       
       toast.success('Thank you! You\'ll be notified as soon as our AI feature launches.')
       setEmail('')
