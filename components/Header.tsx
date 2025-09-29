@@ -25,19 +25,27 @@ export default function Header({ onNavigateToServices, onNavigateToCruises, onNa
   
   const handlePhoneClick = () => {
     const phoneNumber = '61 415 355 851'
-    // Copy to clipboard
-    navigator.clipboard.writeText(phoneNumber).then(() => {
-      toast.success(`Phone number copied: ${phoneNumber}`, {
-        description: 'Click to call or paste anywhere',
-        duration: 4000,
+    const displayNumber = '+61 415 355 851'
+    const telNumber = 'tel:+61415355851'
+    
+    // Try to open dialer first (mobile-friendly)
+    if (window.location.protocol === 'https:' || window.location.hostname === 'localhost') {
+      window.location.href = telNumber;
+    } else {
+      // Fallback - copy to clipboard
+      navigator.clipboard.writeText(displayNumber).then(() => {
+        toast.success(`📞 Phone number copied: ${displayNumber}`, {
+          description: 'Tap to call or paste anywhere - Linda Forster',
+          duration: 5000,
+        })
+      }).catch(() => {
+        // Fallback for older browsers
+        toast.success(`📞 Call Linda: ${displayNumber}`, {
+          description: 'Your travel specialist is ready to help',
+          duration: 5000,
+        })
       })
-    }).catch(() => {
-      // Fallback for older browsers
-      toast.success(`Call us: ${phoneNumber}`, {
-        description: 'Phone number ready to dial',
-        duration: 4000,
-      })
-    })
+    }
   }
 
   useEffect(() => {
