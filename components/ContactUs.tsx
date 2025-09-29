@@ -87,18 +87,51 @@ export default function ContactUs({ onNavigateToCruises, onNavigateToTravelOptio
           duration: 6000
         })
       } else {
-        // Prepare email template parameters
+        // Prepare email template parameters with multiple field name formats for compatibility
         const templateParams = {
+          // Standard EmailJS template fields
           from_name: formData.name,
           from_email: formData.email,
+          to_email: 'hello@travlintravel.com.au',
+          subject: `Travel Inquiry from ${formData.name}`,
+          
+          // Custom form fields
           phone: formData.phone,
           travel_type: formData.travel_type,
           destination: formData.destination,
           budget: formData.budget,
           travelers: formData.travelers,
           travel_dates: formData.travel_dates,
-          message: formData.message,
-          to_email: 'hello@travlintravel.com.au'
+          
+          // Comprehensive message field
+          message: `NEW TRAVEL INQUIRY from ${formData.name}
+
+CONTACT DETAILS:
+Name: ${formData.name}
+Email: ${formData.email}
+Phone: ${formData.phone}
+
+TRAVEL REQUIREMENTS:
+Travel Type: ${formData.travel_type}
+Destination: ${formData.destination}
+Budget: ${formData.budget}
+Number of Travelers: ${formData.travelers}
+Travel Dates: ${formData.travel_dates}
+
+ADDITIONAL MESSAGE:
+${formData.message}
+
+Inquiry received: ${new Date().toISOString()}
+Source: Contact Us Form - TravLin Travel Website`,
+
+          // Alternative field names for different template compatibility
+          user_name: formData.name,
+          user_email: formData.email,
+          user_phone: formData.phone,
+          user_message: formData.message,
+          inquiry_type: 'Travel Planning Inquiry',
+          source: 'Contact Us Form',
+          timestamp: new Date().toISOString()
         }
 
         // Send email via EmailJS
