@@ -231,22 +231,31 @@ export default function TravelInsurance() {
               {/* Blue CALL Button - Last - WRAPPED TO TEXT WIDTH */}
               <div className="flex-shrink-0">
                 <button
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    
                     const tel = `tel:${phoneNumber}`;
                     const displayNumber = '1300 72 88 22';
                     
+                    console.log('📞 Travel Insurance call button clicked!')
+                    
                     // Try to open dialer first
-                    if (window.location.protocol === 'https:' || window.location.hostname === 'localhost') {
+                    try {
                       window.location.href = tel;
-                    } else {
+                      toast.success(`📞 Calling: ${displayNumber}`, {
+                        description: 'Medical assessment support line',
+                        duration: 3000
+                      });
+                    } catch (error) {
                       // Fallback - copy number and show toast
                       navigator.clipboard.writeText(displayNumber).then(() => {
-                        toast.success(`Phone number copied: ${displayNumber}`, {
+                        toast.success(`📞 Phone number copied: ${displayNumber}`, {
                           description: 'Medical assessment support - tap to call',
                           duration: 5000
                         });
                       }).catch(() => {
-                        toast.success(`Call us: ${displayNumber}`, {
+                        toast.success(`📞 Call us: ${displayNumber}`, {
                           description: 'Medical assessment support',
                           duration: 5000
                         });
@@ -268,7 +277,10 @@ export default function TravelInsurance() {
                     textTransform: 'uppercase',
                     letterSpacing: '0.05em',
                     fontFamily: 'inherit',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    pointerEvents: 'auto',
+                    zIndex: 100,
+                    position: 'relative'
                   }}
                   title="Call 1300 72 88 22 for medical assessment support"
                 >
