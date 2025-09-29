@@ -371,8 +371,8 @@ export default function TermsPrivacy({ isOpen, onClose }: TermsPrivacyProps) {
     }
 
     return (
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4" style={{ zIndex: 999999, position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}>
-        <Card className="w-full max-w-4xl max-h-[90vh] overflow-hidden">
+      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" style={{ zIndex: 999999, position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}>
+        <Card className="w-full max-w-4xl max-h-[90vh] overflow-hidden bg-white shadow-2xl border-2 border-gray-200">
           <div className="flex items-center justify-between p-6 border-b">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--brand-blue)' }}>
@@ -393,7 +393,7 @@ export default function TermsPrivacy({ isOpen, onClose }: TermsPrivacyProps) {
             </Button>
           </div>
           
-          <CardContent className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
+          <CardContent className="p-6 overflow-y-auto max-h-[calc(90vh-200px)] bg-white">
             <div className="space-y-6">
               {/* Quick Access Downloads */}
               <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
