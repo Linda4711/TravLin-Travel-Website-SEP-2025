@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Calendar, Clock, ChevronDown, ChevronUp, ArrowLeft, Bell } from 'lucide-react'
 import { toast } from 'sonner'
 import { motion } from 'framer-motion'
+import emailjs from '@emailjs/browser'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import SEOHead from './components/SEOHead'
@@ -231,12 +232,49 @@ export default function TravLinStories({
       toast.error('Please enter your email address.')
       return
     }
+    
     setIsSubmittingNewsletter(true)
-    setTimeout(() => {
-      toast.success("Successfully subscribed! You'll receive our latest travel stories and tips.")
+    
+    try {
+      // EmailJS Configuration - LIVE
+      const serviceId = 'service_rlnjyuj'
+      const templateId = 'template_aiumzob'
+      const publicKey = 'GY6ImN3fkI91A6mGw'
+      
+      const templateParams = {
+        from_name: 'TravLin Stories Subscriber',
+        from_email: email,
+        message: `New TravLin Stories newsletter subscription from ${email}.
+        
+Email: ${email}
+Source: TravLin Stories Page Newsletter Signup
+Subscription Type: Travel Stories & Tips Newsletter
+Timestamp: ${new Date().toISOString()}
+
+Please add this email to the TravLin Stories newsletter mailing list for travel insights, destination guides, and special offers.`,
+        subscriber_email: email,
+        source: 'TravLin Stories Newsletter Signup',
+        subscription_type: 'Travel Stories Newsletter',
+        timestamp: new Date().toISOString(),
+        to_email: 'hello@travlintravel.com.au'
+      }
+      
+      // Send email via EmailJS
+      await emailjs.send(serviceId, templateId, templateParams, publicKey)
+      console.log('✅ TravLin Stories newsletter subscription sent via EmailJS')
+      
+      toast.success('🎉 Successfully subscribed to TravLin Stories!', {
+        description: "You'll receive our latest travel stories and insider tips.",
+        duration: 5000
+      })
+      
       setEmail('')
+    } catch (error) {
+      console.error('EmailJS Error:', error)
+      toast.error('Something went wrong. Please try again later.')
+    } finally {
       setIsSubmittingNewsletter(false)
-    }, 1000)
+    }
   }
 
   // INDIVIDUAL ARTICLE VIEW
