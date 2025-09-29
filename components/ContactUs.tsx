@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { MapPin, Mail, Phone, Clock, Send, Bot, Star, Facebook, Instagram, Youtube } from 'lucide-react'
 import { toast } from 'sonner'
 import emailjs from '@emailjs/browser'
@@ -63,87 +63,60 @@ export default function ContactUs({ onNavigateToCruises, onNavigateToTravelOptio
       const templateId = 'template_aiumzob'
       const publicKey = 'GY6ImN3fkI91A6mGw'
       
-      // Check if EmailJS is configured (this check is now obsolete since we have real credentials)
-      if (false) {
-        // Fallback for when EmailJS isn't configured yet
-        console.log('📧 EmailJS not configured yet. Logging form data:', {
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          travel_type: formData.travel_type,
-          destination: formData.destination,
-          budget: formData.budget,
-          travelers: formData.travelers,
-          travel_dates: formData.travel_dates,
-          message: formData.message,
-          timestamp: new Date().toISOString()
-        })
+      // Prepare email template parameters with multiple field name formats for compatibility
+      const templateParams = {
+        // Standard EmailJS template fields
+        from_name: formData.name,
+        from_email: formData.email,
+        to_email: 'hello@travlintravel.com.au',
+        subject: `Travel Inquiry from ${formData.name}`,
         
-        // Simulate sending delay
-        await new Promise(resolve => setTimeout(resolve, 1500))
+        // Custom form fields
+        phone: formData.phone,
+        travel_type: formData.travel_type,
+        destination: formData.destination,
+        budget: formData.budget,
+        travelers: formData.travelers,
+        travel_dates: formData.travel_dates,
         
-        toast.success('Thank you for your inquiry! We\'ll be in touch within 24 hours to start planning your perfect journey.', {
-          description: 'Your travel inquiry has been received and sent to our team.',
-          duration: 6000
-        })
-      } else {
-        // Prepare email template parameters with multiple field name formats for compatibility
-        const templateParams = {
-          // Standard EmailJS template fields
-          from_name: formData.name,
-          from_email: formData.email,
-          to_email: 'hello@travlintravel.com.au',
-          subject: `Travel Inquiry from ${formData.name}`,
-          
-          // Custom form fields
-          phone: formData.phone,
-          travel_type: formData.travel_type,
-          destination: formData.destination,
-          budget: formData.budget,
-          travelers: formData.travelers,
-          travel_dates: formData.travel_dates,
-          
-          // Comprehensive message field
-          message: `NEW TRAVEL INQUIRY from ${formData.name}
+        // Comprehensive message field
+        message: `NEW TRAVEL INQUIRY from ${formData.name}
 
 CONTACT DETAILS:
 Name: ${formData.name}
 Email: ${formData.email}
-Phone: ${formData.phone}
+Phone: ${formData.phone || 'Not provided'}
 
-TRAVEL REQUIREMENTS:
-Travel Type: ${formData.travel_type}
-Destination: ${formData.destination}
-Budget: ${formData.budget}
-Number of Travelers: ${formData.travelers}
-Travel Dates: ${formData.travel_dates}
+TRAVEL PREFERENCES:
+Type of Travel: ${formData.travel_type || 'Not specified'}
+Destination: ${formData.destination || 'Open to suggestions'}
+Budget: ${formData.budget || 'Not specified'}
+Number of Travelers: ${formData.travelers || 'Not specified'}
+Travel Dates: ${formData.travel_dates || 'Flexible'}
 
-ADDITIONAL MESSAGE:
-${formData.message}
+MESSAGE:
+${formData.message || 'No additional message'}
 
-Inquiry received: ${new Date().toISOString()}
-Source: Contact Us Form - TravLin Travel Website`,
-
-          // Alternative field names for different template compatibility
-          user_name: formData.name,
-          user_email: formData.email,
-          user_phone: formData.phone,
-          user_message: formData.message,
-          inquiry_type: 'Travel Planning Inquiry',
-          source: 'Contact Us Form',
-          timestamp: new Date().toISOString()
-        }
-
-        // Send email via EmailJS
-        const response = await emailjs.send(serviceId, templateId, templateParams, publicKey)
+---
+Submitted via TravLin Travel Contact Form`,
         
-        console.log('✅ EmailJS response:', response)
-        
-        toast.success('Thank you for your inquiry! We\'ll be in touch within 24 hours to start planning your perfect journey.', {
-          description: 'Your travel inquiry has been sent successfully.',
-          duration: 6000
-        })
+        // Template-specific fields for display
+        user_name: formData.name,
+        user_email: formData.email,
+        user_phone: formData.phone || 'Not provided',
+        user_travel_type: formData.travel_type || 'Not specified',
+        user_destination: formData.destination || 'Open to suggestions',
+        user_budget: formData.budget || 'Not specified',
+        user_travelers: formData.travelers || 'Not specified',
+        user_travel_dates: formData.travel_dates || 'Flexible',
+        user_message: formData.message,
+        inquiry_type: 'Travel Planning Inquiry',
+        source: 'Contact Us Form',
+        timestamp: new Date().toISOString()
       }
+
+      // Send email via EmailJS
+      const response = await emailjs.send(serviceId, templateId, templateParams, publicKey)
       
       console.log('✅ EmailJS response:', response)
       
@@ -181,458 +154,363 @@ Source: Contact Us Form - TravLin Travel Website`,
       }
       
       toast.error(errorMessage, {
-        description: 'You can also email us directly at hello@travlintravel.com.au',
+        description: 'Contact us directly: hello@travlintravel.com.au or (07) 5300 5780',
         duration: 8000
       })
+    } finally {
+      setIsSubmitting(false)
     }
-    
-    setIsSubmitting(false)
   }
 
   return (
-    <section id="contact" className="py-8 relative overflow-hidden" style={{ backgroundColor: 'var(--gray-50)' }}>
-      {/* Enhanced floating background elements - Reduced opacity for subtle effect */}
-      <div className="absolute top-20 left-10 w-64 h-64 watercolor-blob opacity-3 floating-element"></div>
-      <div className="absolute bottom-32 right-20 w-48 h-48 watercolor-blob-coral opacity-4 floating-element" style={{ animationDelay: '3s' }}></div>
-      <div className="absolute top-1/2 left-1/3 w-32 h-32 watercolor-blob opacity-2 floating-element" style={{ animationDelay: '1.5s' }}></div>
-      <div className="absolute bottom-20 left-10 w-40 h-40 watercolor-blob-coral opacity-3 floating-element" style={{ animationDelay: '4s' }}></div>
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-        {/* Section separator - matches home page exactly */}
-        <div className="text-center mb-6">
-          <div className="content-separator"></div>
+    <div className="section-spacing section-light">
+      <div className="content-container">
+        
+        {/* Header Section */}
+        <div className="text-center margin-bottom-large">
+          <div className="section-divider"></div>
+          <h1 className="section-heading">Contact Our Travel Experts</h1>
+          <p className="text-description-large max-w-3xl mx-auto">
+            Ready to turn your travel dreams into reality? Our experienced travel consultants are here to create your perfect journey. Get in touch today for personalised service and expert advice.
+          </p>
         </div>
 
-        {/* Contact Grid - Enhanced Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-          {/* Left Column: Contact Information + Travel Planning */}
-          <div>
-            {/* Contact Information - NOW AT TOP */}
-            <div className="travel-card p-8 mb-8">
-              <h3 className="text-2xl font-bold mb-6 flex items-center" style={{ color: 'var(--brand-blue)' }}>
-                <MapPin className="w-6 h-6 mr-3" />
-                Contact Information
-              </h3>
+        <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+          
+          {/* Contact Information */}
+          <div className="space-y-8">
+            <div>
+              <h2 className="component-heading">Get In Touch</h2>
+              <p className="text-description margin-bottom">
+                Speak with our travel experts who specialise in creating extraordinary journeys tailored to your preferences and budget.
+              </p>
+            </div>
 
-              {/* Contact Info - Better Layout with Business Hours moved up */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
-                {/* Phone */}
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'var(--brand-blue)' }}>
-                    <Phone className="w-4 h-4 text-white" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-sm" style={{ color: 'var(--gray-800)' }}>Phone</h4>
-                    <a href="tel:+61415355851" className="text-blue-600 hover:text-blue-800 transition-colors duration-200 text-sm">
-                      +61 415 355 851
-                    </a>
-                  </div>
+            {/* Contact Details */}
+            <div className="space-y-6">
+              <div className="flex items-start space-x-4 p-6 bg-white rounded-lg shadow-sm border border-gray-100">
+                <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <Phone className="w-6 h-6 text-blue-600" />
                 </div>
-
-                {/* Email - consistent text sizing */}
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'var(--brand-orange)' }}>
-                    <Mail className="w-4 h-4 text-white" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-sm" style={{ color: 'var(--gray-800)' }}>Email</h4>
-                    <a href="mailto:hello@travlintravel.com.au" className="text-blue-600 hover:text-blue-800 transition-colors duration-200 text-sm">
-                      hello@travlintravel.com.au
-                    </a>
-                  </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-800 mb-2">Phone</h3>
+                  <p className="text-gray-600 mb-2">Call us for immediate assistance</p>
+                  <a href="tel:0753005780" className="text-blue-600 hover:text-blue-700 font-medium text-lg">
+                    (07) 5300 5780
+                  </a>
                 </div>
               </div>
 
-              {/* Address and Business Hours side by side */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
-                {/* Address */}
-                <div className="flex items-start space-x-2">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'var(--brand-yellow)' }}>
-                    <MapPin className="w-4 h-4" style={{ color: 'var(--gray-800)' }} />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-sm mb-1" style={{ color: 'var(--gray-800)' }}>Address</h4>
-                    <div className="text-gray-600 text-sm">
-                      PO BOX 7303<br />
-                      KARINGAL CENTRE KARINGAL<br />
-                      VIC 3199 AUSTRALIA
-                    </div>
-                  </div>
+              <div className="flex items-start space-x-4 p-6 bg-white rounded-lg shadow-sm border border-gray-100">
+                <div className="flex-shrink-0 w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                  <Mail className="w-6 h-6 text-orange-600" />
                 </div>
-
-                {/* Business Hours */}
-                <div className="flex items-start space-x-2">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'var(--brand-blue)' }}>
-                    <Clock className="w-4 h-4 text-white" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-sm mb-1" style={{ color: 'var(--gray-800)' }}>Business Hours</h4>
-                    <div className="text-gray-600 text-sm">
-                      Mon-Fri: 9:00AM - 5:30PM<br />
-                      Sat: By appointment<br />
-                      Sun: Closed
-                    </div>
-                  </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-800 mb-2">Email</h3>
+                  <p className="text-gray-600 mb-2">Send us your travel inquiry</p>
+                  <a href="mailto:hello@travlintravel.com.au" className="text-orange-600 hover:text-orange-700 font-medium">
+                    hello@travlintravel.com.au
+                  </a>
                 </div>
               </div>
 
-              {/* Social Media */}
-              <div className="pt-6 border-t border-gray-200">
-                <h4 className="font-semibold mb-4 text-center" style={{ color: 'var(--gray-800)' }}>CONNECT & FOLLOW</h4>
-                <div className="flex justify-center space-x-4">
-                  <a href="https://www.facebook.com/travlintravel" target="_blank" rel="noopener noreferrer" 
-                     className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110" 
-                     style={{ backgroundColor: 'var(--brand-blue)' }}>
-                    <Facebook className="w-5 h-5 text-white" />
-                  </a>
-                  
-                  <a href="https://www.instagram.com/travlintravel" target="_blank" rel="noopener noreferrer" 
-                     className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110" 
-                     style={{ backgroundColor: '#E1306C' }}>
-                    <Instagram className="w-5 h-5 text-white" />
-                  </a>
-                  
-                  <a href="https://www.youtube.com/@travlintravel/videos" target="_blank" rel="noopener noreferrer" 
-                     className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110" 
-                     style={{ backgroundColor: '#FF0000' }}>
-                    <Youtube className="w-5 h-5 text-white" />
-                  </a>
+              <div className="flex items-start space-x-4 p-6 bg-white rounded-lg shadow-sm border border-gray-100">
+                <div className="flex-shrink-0 w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                  <MapPin className="w-6 h-6 text-yellow-600" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-800 mb-2">Location</h3>
+                  <p className="text-gray-600 mb-2">Serving clients across Australia</p>
+                  <p className="text-gray-800 font-medium">Sunshine Coast, Queensland</p>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-4 p-6 bg-white rounded-lg shadow-sm border border-gray-100">
+                <div className="flex-shrink-0 w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                  <Clock className="w-6 h-6 text-green-600" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-800 mb-2">Business Hours</h3>
+                  <div className="space-y-1 text-gray-600">
+                    <p>Monday - Friday: 9:00 AM - 5:00 PM</p>
+                    <p>Saturday: 9:00 AM - 1:00 PM</p>
+                    <p>Sunday: Closed</p>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Travel Planning - MOVED BELOW CONTACT INFORMATION */}
-            <div className="travel-card p-8">
-              
-              <div className="mb-6">
-                <p className="text-gray-600 leading-relaxed">
-                  For exploring and experimenting with any Cruise or Travel options before the human experts step in to finalize the plans, return to the AI world here.
-                </p>
-                
-                {/* ENHANCED COMING SOON BANNER - Bigger like Cruise & Travel Options */}
-                <div className="flex justify-center mt-4 mb-4">
-                  <span 
-                    className="text-gray-800 text-lg font-black px-8 py-3 rounded-lg rotate-2 transform"
-                    style={{
-                      background: `linear-gradient(135deg, var(--brand-yellow) 0%, #ffcd33 50%, var(--brand-yellow) 100%)`,
-                      boxShadow: `0 15px 40px rgba(255, 192, 0, 0.8), 0 10px 25px rgba(255, 192, 0, 0.6), 0 5px 15px rgba(255, 192, 0, 0.4)`,
-                      border: '3px solid rgba(255, 192, 0, 0.9)',
-                      animation: 'softFlash 3s ease-in-out infinite',
-                      letterSpacing: '2px',
-                      textTransform: 'uppercase',
-                      textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
-                    }}
-                  >
-                    COMING SOON
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-4">
-                <TravLinButton
-                  variant="yellow"
-                  size="reduced" 
-                  className="w-full"
-                  style={{
-                    borderRadius: '4px',
-                    minHeight: '38px',
-                    paddingTop: '0.5rem',
-                    paddingBottom: '0.5rem'
-                  }}
-                  onClick={() => {
-                    if (onNavigateToCruises) {
-                      onNavigateToCruises()
-                      // Navigate to cruise page AI section
-                      setTimeout(() => {
-                        const aiSection = document.querySelector('[data-ai-cruise-section]')
-                        if (aiSection) {
-                          aiSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                        }
-                      }, 100)
-                    }
-                  }}
+            {/* Social Media */}
+            <div>
+              <h3 className="font-semibold text-gray-800 mb-4">Follow Our Journeys</h3>
+              <div className="flex space-x-4">
+                <a 
+                  href="https://facebook.com/travlintravel" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="w-12 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center transition-colors"
                 >
-                  CRUISE PLANNER
-                </TravLinButton>
-                
-                <TravLinButton
-                  variant="yellow"
-                  size="reduced" 
-                  className="w-full"
-                  style={{
-                    borderRadius: '4px',
-                    minHeight: '38px',
-                    paddingTop: '0.5rem',
-                    paddingBottom: '0.5rem'
-                  }}
-                  onClick={() => {
-                    if (onNavigateToTravelOptions) {
-                      onNavigateToTravelOptions()
-                      // Navigate to travel options page AI section
-                      setTimeout(() => {
-                        const aiSection = document.querySelector('[data-ai-travel-section]')
-                        if (aiSection) {
-                          aiSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                        }
-                      }, 100)
-                    }
-                  }}
+                  <Facebook className="w-6 h-6" />
+                </a>
+                <a 
+                  href="https://instagram.com/travlintravel" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="w-12 h-12 bg-pink-600 hover:bg-pink-700 text-white rounded-lg flex items-center justify-center transition-colors instagram-icon-fix"
                 >
-                  TRAVEL PLANNER
-                </TravLinButton>
+                  <Instagram className="w-6 h-6" />
+                </a>
+                <a 
+                  href="https://youtube.com/@travlintravel" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="w-12 h-12 bg-red-600 hover:bg-red-700 text-white rounded-lg flex items-center justify-center transition-colors"
+                >
+                  <Youtube className="w-6 h-6" />
+                </a>
               </div>
             </div>
           </div>
 
-          {/* Right Column: Contact Form Only */}
-          <div>
-            <div className="travel-card p-8">
-              <h3 className="text-2xl font-bold mb-6 flex items-center" style={{ color: 'var(--brand-blue)' }}>
-                <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <span style={{ color: 'var(--brand-blue)' }}>Send Us a Message</span>
-              </h3>
+          {/* Contact Form */}
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
+            <div className="mb-6">
+              <h2 className="component-heading">Send Us Your Travel Inquiry</h2>
+              <p className="text-description">
+                Tell us about your dream destination and we'll create the perfect itinerary for you.
+              </p>
+            </div>
 
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Honeypot field for bot detection - hidden from users */}
-                <div style={{ display: 'none' }}>
-                  <input
-                    type="text"
-                    name="honeypot"
-                    value={formData.honeypot}
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Honeypot field for bot detection */}
+              <input
+                type="text"
+                name="honeypot"
+                value={formData.honeypot}
+                onChange={handleInputChange}
+                className="hidden"
+                tabIndex={-1}
+                autoComplete="off"
+              />
+
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                  Full Name *
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  placeholder="Enter your full name"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                  Email Address *
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  placeholder="Enter your email address"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  placeholder="Enter your phone number"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="travel_type" className="block text-sm font-medium text-gray-700 mb-2">
+                  Type of Travel
+                </label>
+                <select
+                  id="travel_type"
+                  name="travel_type"
+                  value={formData.travel_type}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                >
+                  <option value="">Select travel type</option>
+                  <option value="cruise">Cruise</option>
+                  <option value="tour">Escorted Tour</option>
+                  <option value="independent">Independent Travel</option>
+                  <option value="business">Business Travel</option>
+                  <option value="honeymoon">Honeymoon/Romance</option>
+                  <option value="family">Family Holiday</option>
+                  <option value="adventure">Adventure Travel</option>
+                  <option value="luxury">Luxury Travel</option>
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="destination" className="block text-sm font-medium text-gray-700 mb-2">
+                  Preferred Destination
+                </label>
+                <input
+                  type="text"
+                  id="destination"
+                  name="destination"
+                  value={formData.destination}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  placeholder="Where would you like to go?"
+                />
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="travelers" className="block text-sm font-medium text-gray-700 mb-2">
+                    Number of Travelers
+                  </label>
+                  <select
+                    id="travelers"
+                    name="travelers"
+                    value={formData.travelers}
                     onChange={handleInputChange}
-                    tabIndex={-1}
-                    autoComplete="off"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="text-description-small font-semibold mb-2 block" style={{ color: 'var(--gray-700)' }}>Full Name *</label>
-                    <input 
-                      type="text" 
-                      name="name" 
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      required 
-                      placeholder="Your full name" 
-                      className="w-full px-3 py-2.5 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent" 
-                      style={{ 
-                        borderColor: 'var(--gray-300)', 
-                        '--tw-ring-color': 'var(--brand-blue)',
-                        fontSize: '0.875rem',
-                        minHeight: '42px'
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-description-small font-semibold mb-2 block" style={{ color: 'var(--gray-700)' }}>Email Address *</label>
-                    <input 
-                      type="email" 
-                      name="email" 
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      required 
-                      placeholder="your.email@example.com" 
-                      className="w-full px-3 py-2.5 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent" 
-                      style={{ 
-                        borderColor: 'var(--gray-300)', 
-                        '--tw-ring-color': 'var(--brand-blue)',
-                        fontSize: '0.875rem',
-                        minHeight: '42px'
-                      }}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="text-description-small font-semibold mb-2 block" style={{ color: 'var(--gray-700)' }}>Phone Number</label>
-                    <input 
-                      type="tel" 
-                      name="phone" 
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      placeholder="+61 4XX XXX XXX" 
-                      className="w-full px-3 py-2.5 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent" 
-                      style={{ 
-                        borderColor: 'var(--gray-300)', 
-                        '--tw-ring-color': 'var(--brand-blue)',
-                        fontSize: '0.875rem',
-                        minHeight: '42px'
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-description-small font-semibold mb-2 block" style={{ color: 'var(--gray-700)' }}>Travel Type</label>
-                    <select 
-                      name="travel_type" 
-                      value={formData.travel_type}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2.5 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent" 
-                      style={{ 
-                        borderColor: 'var(--gray-300)', 
-                        backgroundColor: 'var(--white)', 
-                        '--tw-ring-color': 'var(--brand-blue)',
-                        fontSize: '0.875rem',
-                        minHeight: '42px'
-                      }}
-                    >
-                      <option value="">Select travel type</option>
-                      <option value="Cruise Holiday">Cruise Holiday</option>
-                      <option value="Escorted Tour">Escorted Tour</option>
-                      <option value="Independent Travel">Independent Travel</option>
-                      <option value="Group Travel">Group Travel</option>
-                      <option value="Honeymoon/Romance">Honeymoon/Romance</option>
-                      <option value="Family Vacation">Family Vacation</option>
-                      <option value="Adventure Travel">Adventure Travel</option>
-                      <option value="Cultural Experience">Cultural Experience</option>
-                      <option value="Other">Other</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="text-description-small font-semibold mb-2 block" style={{ color: 'var(--gray-700)' }}>Approximate Budget (AUD)</label>
-                    <select 
-                      name="budget" 
-                      value={formData.budget}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2.5 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent" 
-                      style={{ 
-                        borderColor: 'var(--gray-300)', 
-                        backgroundColor: 'var(--white)', 
-                        '--tw-ring-color': 'var(--brand-blue)',
-                        fontSize: '0.875rem',
-                        minHeight: '42px'
-                      }}
-                    >
-                      <option value="">Select budget range</option>
-                      <option value="Under $2,000">Under $2,000</option>
-                      <option value="$2,000 - $5,000">$2,000 - $5,000</option>
-                      <option value="$5,000 - $10,000">$5,000 - $10,000</option>
-                      <option value="$10,000 - $15,000">$10,000 - $15,000</option>
-                      <option value="$15,000 - $25,000">$15,000 - $25,000</option>
-                      <option value="Over $25,000">Over $25,000</option>
-                      <option value="Flexible">Flexible</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-description-small font-semibold mb-2 block" style={{ color: 'var(--gray-700)' }}>Number of Travelers</label>
-                    <select 
-                      name="travelers" 
-                      value={formData.travelers}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2.5 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent" 
-                      style={{ 
-                        borderColor: 'var(--gray-300)', 
-                        backgroundColor: 'var(--white)', 
-                        '--tw-ring-color': 'var(--brand-blue)',
-                        fontSize: '0.875rem',
-                        minHeight: '42px'
-                      }}
-                    >
-                      <option value="">Select number</option>
-                      <option value="1">1 Traveler</option>
-                      <option value="2">2 Travelers</option>
-                      <option value="3-4">3-4 Travelers</option>
-                      <option value="5-8">5-8 Travelers</option>
-                      <option value="9+">9+ Travelers</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="text-description-small font-semibold mb-2 block" style={{ color: 'var(--gray-700)' }}>Destination(s) of Interest</label>
-                    <input 
-                      type="text" 
-                      name="destination" 
-                      value={formData.destination}
-                      onChange={handleInputChange}
-                      placeholder="e.g., Mediterranean, Alaska, Japan, Europe..." 
-                      className="w-full px-3 py-2.5 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent" 
-                      style={{ 
-                        borderColor: 'var(--gray-300)', 
-                        '--tw-ring-color': 'var(--brand-blue)',
-                        fontSize: '0.875rem',
-                        minHeight: '42px'
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-description-small font-semibold mb-2 block" style={{ color: 'var(--gray-700)' }}>Preferred Travel Dates</label>
-                    <input 
-                      type="text" 
-                      name="travel_dates" 
-                      value={formData.travel_dates}
-                      onChange={handleInputChange}
-                      placeholder="e.g., March 2025, Flexible" 
-                      className="w-full px-3 py-2.5 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent" 
-                      style={{ 
-                        borderColor: 'var(--gray-300)', 
-                        '--tw-ring-color': 'var(--brand-blue)',
-                        fontSize: '0.875rem',
-                        minHeight: '42px'
-                      }}
-                    />
-                  </div>
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  >
+                    <option value="">Select</option>
+                    <option value="1">1 Traveler</option>
+                    <option value="2">2 Travelers</option>
+                    <option value="3-4">3-4 Travelers</option>
+                    <option value="5-8">5-8 Travelers</option>
+                    <option value="9+">9+ Travelers</option>
+                  </select>
                 </div>
 
                 <div>
-                  <label className="text-description-small font-semibold mb-2 block" style={{ color: 'var(--gray-700)' }}>Tell Us About Your Dream Trip</label>
-                  <textarea 
-                    name="message" 
-                    value={formData.message}
+                  <label htmlFor="budget" className="block text-sm font-medium text-gray-700 mb-2">
+                    Budget Range (AUD)
+                  </label>
+                  <select
+                    id="budget"
+                    name="budget"
+                    value={formData.budget}
                     onChange={handleInputChange}
-                    rows={5}
-                    placeholder="Share your travel dreams, special interests, celebrations, accessibility needs, or any specific requests..." 
-                    className="w-full resize-none px-3 py-2.5 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent" 
-                    style={{ 
-                      borderColor: 'var(--gray-300)', 
-                      '--tw-ring-color': 'var(--brand-blue)',
-                      fontSize: '0.875rem',
-                      lineHeight: '1.5',
-                      minHeight: '100px'
-                    }}
-                  ></textarea>
-                </div>
-
-                <div className="flex justify-center">
-                  <TravLinButton
-                    type="submit" 
-                    disabled={isSubmitting}
-                    variant="blue"
-                    size="reduced" 
-                    className="w-full max-w-md"
-                    style={{
-                      borderRadius: '4px',
-                      minHeight: '38px',
-                      paddingTop: '0.5rem',
-                      paddingBottom: '0.5rem'
-                    }}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   >
-                    {isSubmitting ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2 inline-block"></div>
-                        Sending...
-                      </>
-                    ) : (
-                      'SEND INQUIRY'
-                    )}
-                  </TravLinButton>
+                    <option value="">Select budget</option>
+                    <option value="under-3000">Under $3,000</option>
+                    <option value="3000-5000">$3,000 - $5,000</option>
+                    <option value="5000-10000">$5,000 - $10,000</option>
+                    <option value="10000-20000">$10,000 - $20,000</option>
+                    <option value="over-20000">Over $20,000</option>
+                  </select>
                 </div>
+              </div>
 
-                <p className="text-xs text-center" style={{ color: 'var(--gray-500)' }}>
-                  TravLin Travel respects your privacy.
-                </p>
-              </form>
+              <div>
+                <label htmlFor="travel_dates" className="block text-sm font-medium text-gray-700 mb-2">
+                  Preferred Travel Dates
+                </label>
+                <input
+                  type="text"
+                  id="travel_dates"
+                  name="travel_dates"
+                  value={formData.travel_dates}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  placeholder="e.g., March 2024, flexible, 2-3 weeks"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                  Tell Us About Your Dream Trip
+                </label>
+                <textarea
+                  id="message"
+                  name="message"
+                  value={formData.message}
+                  onChange={handleInputChange}
+                  rows={5}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-vertical"
+                  placeholder="Share any special requirements, interests, or questions you have about your trip..."
+                ></textarea>
+              </div>
+
+              <TravLinButton
+                type="submit"
+                variant="blue"
+                size="lg"
+                disabled={isSubmitting}
+                className="w-full justify-center"
+                style={{ borderRadius: '0px' }}
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-5 h-5 mr-2" />
+                    Send Travel Inquiry
+                  </>
+                )}
+              </TravLinButton>
+            </form>
+          </div>
+        </div>
+
+        {/* AI Travel Planner Call-to-Action */}
+        <div className="mt-16 text-center bg-gradient-to-r from-blue-50 to-orange-50 rounded-2xl p-8 border border-blue-100">
+          <div className="max-w-2xl mx-auto">
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-orange-500 rounded-full flex items-center justify-center">
+                <Bot className="w-8 h-8 text-white" />
+              </div>
+            </div>
+            <h2 className="component-heading">Want Instant Travel Ideas?</h2>
+            <p className="text-description margin-bottom">
+              Try our AI Travel Planner for immediate destination suggestions and itinerary ideas based on your preferences.
+            </p>
+            <div className="button-group">
+              <TravLinButton
+                variant="orange"
+                size="reduced"
+                onClick={onNavigateToTravelOptions}
+                className="shadow-lg"
+                style={{ borderRadius: '0px' }}
+              >
+                Explore AI Travel Planner
+              </TravLinButton>
+              {onNavigateToCruises && (
+                <TravLinButton
+                  variant="blue"
+                  size="reduced"
+                  onClick={onNavigateToCruises}
+                  className="shadow-lg"
+                  style={{ borderRadius: '0px' }}
+                >
+                  Browse Cruises
+                </TravLinButton>
+              )}
             </div>
           </div>
         </div>
       </div>
-    </section>
+    </div>
   )
 }
