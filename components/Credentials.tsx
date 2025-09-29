@@ -222,7 +222,7 @@ export default function Credentials() {
                   {/* Logo and Icon Section - Side by Side */}
                   <div className="flex items-center justify-center mb-6 space-x-3">
                     {/* Professional Logo Container - ATIA & NTIA get full size, others get placeholder box */}
-                    <div className="relative flex items-center justify-center" style={{ minHeight: '120px', maxWidth: '150px', overflow: 'hidden' }}>
+                    <div className="relative flex items-center justify-center" style={{ minHeight: '120px', width: '100%', maxWidth: '180px' }}>
                       {/* Display actual logos at full size without box for all credentials */}
                       {(credential.id === 1 || credential.id === 2 || credential.id === 3 || credential.id === 4 || credential.id === 5 || credential.id === 6 || credential.id === 7 || credential.id === 8) && credential.logoUrl ? (
                         <img 
