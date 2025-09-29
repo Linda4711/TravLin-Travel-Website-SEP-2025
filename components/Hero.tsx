@@ -1,435 +1,256 @@
 import React, { useState, useEffect } from 'react'
 import TravLinButton from './TravLinButton'
-import { Menu, X, Phone } from 'lucide-react'
-import { toast } from 'sonner'
-// Replaced figma:asset with working URL for deployment
-const signpostIcon = 'https://images.unsplash.com/photo-1702478001496-e08620d8ad58?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzaWducG9zdCUyMGRpcmVjdGlvbiUyMHRyYXZlbCUyMGljb258ZW58MXx8fHwxNzU4MDA0ODc5fDA&ixlib=rb-4.1.0&q=80&w=200'
+import { ChevronDown, MapPin } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { ImageWithFallback } from './figma/ImageWithFallback'
 
-interface HeaderProps {
-  onNavigateToServices?: () => void
-  onNavigateToCruises?: () => void
-  onNavigateToTravelOptions?: () => void
-  onNavigateToContact?: () => void
-  onNavigateToStories?: () => void
-  onNavigateToAbout?: () => void
-  onNavigateToAI?: () => void
-  onNavigateToHome?: () => void
-  forceBlue?: boolean
-}
+const homeHeroImage = 'https://images.unsplash.com/photo-1632272423524-674dbaf145c8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzaW1wbGUlMjBhenVyZSUyMHdhdGVyJTIwYWVyaWFsJTIwdmlld3xlbnwxfHx8fDE3NTg0MzMwMzZ8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral'
+const travlinLogo = 'https://images.unsplash.com/photo-1692691582039-265418372779?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0cmF2ZWwlMjBkaXJlY3Rpb24lMjBzaWducG9zdCUyMHdvb2RlbiUyMGxvZ28lMjB0cmFuc3BhcmVudHxlbnwxfHx8fDE3NTg0Mjc5OTV8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral'
 
-export default function Header({ onNavigateToServices, onNavigateToCruises, onNavigateToTravelOptions, onNavigateToContact, onNavigateToStories, onNavigateToAbout, onNavigateToAI, onNavigateToHome, forceBlue = false }: HeaderProps) {
-  const [isScrolled, setIsScrolled] = useState(false)
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [scrollProgress, setScrollProgress] = useState(0)
-
-  
-  const handlePhoneClick = () => {
-    const phoneNumber = '61 415 355 851'
-    // Copy to clipboard
-    navigator.clipboard.writeText(phoneNumber).then(() => {
-      toast.success(`Phone number copied: ${phoneNumber}`, {
-        description: 'Click to call or paste anywhere',
-        duration: 4000,
-      })
-    }).catch(() => {
-      // Fallback for older browsers
-      toast.success(`Call us: ${phoneNumber}`, {
-        description: 'Phone number ready to dial',
-        duration: 4000,
-      })
-    })
-  }
+export default function Hero() {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const [isLoaded, setIsLoaded] = useState(false)
 
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY
-      const documentHeight = document.documentElement.scrollHeight - window.innerHeight
-      const progress = (scrollPosition / documentHeight) * 100
-      
-      setIsScrolled(scrollPosition > 100)
-      setScrollProgress(Math.min(progress, 100))
+    setIsLoaded(true)
+    
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({
+        x: (e.clientX / window.innerWidth) * 2 - 1,
+        y: (e.clientY / window.innerHeight) * 2 - 1
+      })
     }
 
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
+    window.addEventListener('mousemove', handleMouseMove)
+    return () => window.removeEventListener('mousemove', handleMouseMove)
   }, [])
 
-  // Close menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Element
-      if (isMobileMenuOpen && !target.closest('.mobile-menu-dropdown') && !target.closest('button')) {
-        setIsMobileMenuOpen(false)
-      }
+  const scrollToNextSection = () => {
+    // Scroll to The TravLin Advantage section
+    const advantageSection = document.getElementById('advantage')
+    if (advantageSection) {
+      advantageSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      return
     }
-
-    if (isMobileMenuOpen) {
-      document.addEventListener('click', handleClickOutside)
+    
+    // Fallback to OurValues section  
+    const ourValuesSection = document.getElementById('ourvalues') || document.querySelector('[data-section="ourvalues"]')
+    if (ourValuesSection) {
+      ourValuesSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      return
     }
-
-    return () => {
-      document.removeEventListener('click', handleClickOutside)
-    }
-  }, [isMobileMenuOpen])
-
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen)
+    
+    // Final fallback - just scroll down
+    window.scrollBy({ top: window.innerHeight, behavior: 'smooth' })
   }
-
-  const handleNavClick = (href: string) => {
-    if (href === '#home') {
-      if (onNavigateToHome) {
-        onNavigateToHome()
-      } else {
-        window.scrollTo({ top: 0, behavior: 'smooth' })
-      }
-      toggleMobileMenu()
-      return
-    }
-    
-    if (href === '/cruises') {
-      if (onNavigateToCruises) {
-        onNavigateToCruises()
-      }
-      toggleMobileMenu()
-      return
-    }
-    
-    if (href === '/travel-options') {
-      if (onNavigateToTravelOptions) {
-        onNavigateToTravelOptions()
-      }
-      toggleMobileMenu()
-      return
-    }
-    
-    if (href === '/contact') {
-      if (onNavigateToContact) {
-        onNavigateToContact()
-      }
-      toggleMobileMenu()
-      return
-    }
-    
-    if (href === '/stories') {
-      if (onNavigateToStories) {
-        onNavigateToStories()
-      }
-      toggleMobileMenu()
-      return
-    }
-    
-    if (href === '/about') {
-      if (onNavigateToAbout) {
-        onNavigateToAbout()
-      }
-      toggleMobileMenu()
-      return
-    }
-    
-    if (href === '/ai-planner') {
-      if (onNavigateToAI) {
-        onNavigateToAI()
-      }
-      toggleMobileMenu()
-      return
-    }
-
-    // Handle cross-page anchor navigation (services#travelinsurance)
-    if (href.includes('#') && href.startsWith('/')) {
-      const [page, anchor] = href.split('#')
-      
-      // If we're already on the target page, just scroll to anchor
-      const element = document.querySelector(`#${anchor}`)
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' })
-        toggleMobileMenu()
-        return
-      }
-      
-      // If we're on a different page, navigate and then scroll
-      if (page === '/cruises' && onNavigateToCruises) {
-        onNavigateToCruises()
-        setTimeout(() => {
-          const element = document.querySelector(`#${anchor}`)
-          if (element) {
-            // Account for fixed header height
-            const headerHeight = 80
-            const elementPosition = element.offsetTop - headerHeight
-            window.scrollTo({
-              top: elementPosition,
-              behavior: 'smooth'
-            })
-          }
-        }, 100)
-      } else if (page === '/travel-options' && onNavigateToTravelOptions) {
-        onNavigateToTravelOptions()
-        setTimeout(() => {
-          const element = document.querySelector(`#${anchor}`)
-          if (element) {
-            // Account for fixed header height
-            const headerHeight = 80
-            const elementPosition = element.offsetTop - headerHeight
-            window.scrollTo({
-              top: elementPosition,
-              behavior: 'smooth'
-            })
-          }
-        }, 100)
-      } else if (page === '/stories' && onNavigateToStories) {
-        onNavigateToStories()
-        setTimeout(() => {
-          const element = document.querySelector(`#${anchor}`)
-          if (element) {
-            // Account for fixed header height
-            const headerHeight = 80
-            const elementPosition = element.offsetTop - headerHeight
-            window.scrollTo({
-              top: elementPosition,
-              behavior: 'smooth'
-            })
-          }
-        }, 100)
-      } else if (page === '/about' && onNavigateToAbout) {
-        onNavigateToAbout()
-        setTimeout(() => {
-          const element = document.querySelector(`#${anchor}`)
-          if (element) {
-            // Account for fixed header height
-            const headerHeight = 80
-            const elementPosition = element.offsetTop - headerHeight
-            window.scrollTo({
-              top: elementPosition,
-              behavior: 'smooth'
-            })
-          }
-        }, 100)
-      }
-      toggleMobileMenu()
-      return
-    }
-    
-    // Handle same-page anchor navigation
-    if (href.startsWith('#')) {
-      const element = document.querySelector(href)
-      if (element) {
-        // Account for fixed header height
-        const headerHeight = 80
-        const elementPosition = element.offsetTop - headerHeight
-        window.scrollTo({
-          top: elementPosition,
-          behavior: 'smooth'
-        })
-      }
-      toggleMobileMenu()
-    }
-  }
-
-  // FIXED navigation structure for 5-page TravLin Travel website
-  const navigationItems = [
-    { 
-      name: 'Home', 
-      href: '#home'
-    },
-    { 
-      name: 'About Us', 
-      href: '/about'
-    },
-    { 
-      name: 'Cruises', 
-      href: '/cruises'
-    },
-    { 
-      name: 'Travel Options', 
-      href: '/travel-options'
-    },
-    { 
-      name: 'TravLin Stories', 
-      href: '/stories'
-    },
-    { 
-      name: 'Contact Us', 
-      href: '/contact'
-    }
-  ]
 
   return (
-    <header 
-      className={`fixed top-0 left-0 right-0 transition-all duration-300 ${
-        isScrolled || forceBlue ? 'header-scrolled' : 'header-transparent'
-      }`}
-      style={{ zIndex: 9999 }}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative flex items-center justify-between h-16 sm:h-18 lg:h-20">
-          {/* Brand - Logo Placeholder */}
-          <div className="flex items-center flex-shrink-0">
-            <button 
-              className="flex items-center hover:scale-105 transition-all duration-300" 
-              onClick={() => {
-                if (onNavigateToHome) {
-                  onNavigateToHome()
-                } else {
-                  window.scrollTo({ top: 0, behavior: 'smooth' })
-                }
-              }}
-            >
-              <div className="flex items-center justify-center">
-                <img 
-                  src="https://res.cloudinary.com/dgpwz1nqr/image/upload/v1759070661/2025_graphic_only_on_clear_with_blue_circle_millpa.png"
-                  alt="TravLin Travel - Logo"
-                  className="h-8 w-auto sm:h-10 lg:h-12 object-contain hover:rotate-3 transition-transform duration-300 hover:scale-105"
-                  style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))', border: 'none', outline: 'none', background: 'transparent' }}
-                  onError={(e) => {
-                    console.log('TravLin Logo failed to load - showing fallback');
-                    const target = e.currentTarget as HTMLImageElement;
-                    target.style.display = 'none';
-                    const fallbackDiv = target.nextElementSibling as HTMLElement;
-                    if (fallbackDiv) {
-                      fallbackDiv.style.display = 'flex';
-                    }
-                  }}
-                  onLoad={() => console.log('✅ TravLin ACTUAL Cloudinary logo loaded successfully from dgpwz1nqr!')}
-                />
-                <div 
-                  className="h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 items-center justify-center
-                    bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-lg shadow-lg
-                    hover:rotate-3 transition-all duration-300 hover:scale-105"
-                  style={{ 
-                    display: 'none',
-                    filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))',
-                    fontSize: 'clamp(16px, 3vw, 24px)',
-                    fontWeight: 'bold',
-                    fontFamily: 'Georgia, serif'
-                  }}
-                >
-                  TL
-                </div>
-              </div>
-            </button>
-          </div>
+    <section id="home" className="relative travel-hero-spectacular min-h-screen flex items-center justify-center overflow-hidden">
+      
+      {/* Enhanced Background with Parallax Effect */}
+      <motion.div
+        className="absolute inset-0 z-0 hero-bg-responsive"
+        style={{
+          backgroundImage: `linear-gradient(180deg, rgba(0, 117, 204, 0.45) 0%, rgba(0, 0, 0, 0.25) 50%, rgba(0, 0, 0, 0.45) 100%), url(${homeHeroImage})`,
+          backgroundPosition: 'center 20%',
+          backgroundSize: 'cover',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed',
+          filter: 'brightness(0.95) contrast(1.1) saturate(1.2)',
+          willChange: 'transform'
+        }}
+        animate={{
+          x: mousePosition.x * 10,
+          y: mousePosition.y * 5
+        }}
+        transition={{ type: "spring", stiffness: 50, damping: 50 }}
+      />
 
-          {/* Center Title - Explore Dream Discover */}
-          <div className="absolute left-1/2 transform -translate-x-1/2 hidden md:block pointer-events-none">
-            <div className="text-center">
-              <p 
-                className="text-sm lg:text-lg font-bold tracking-wider uppercase drop-shadow-md transition-colors duration-300 whitespace-nowrap"
-                style={{ color: 'var(--brand-yellow)' }}
+      {/* Mobile-specific background layer - fixed size to prevent rescaling */}
+      <div
+        className="absolute inset-0 z-0 hero-bg-mobile sm:hidden"
+        style={{
+          backgroundImage: `linear-gradient(180deg, rgba(0, 117, 204, 0.45) 0%, rgba(0, 0, 0, 0.25) 50%, rgba(0, 0, 0, 0.45) 100%), url(${homeHeroImage})`,
+          backgroundPosition: 'center 20%',
+          backgroundSize: 'cover',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'scroll',
+          filter: 'brightness(0.95) contrast(1.1) saturate(1.2)',
+          /* Prevent any scaling or transformation on mobile */
+          transform: 'none',
+          transition: 'none',
+          willChange: 'auto'
+        }}
+      />
+
+      {/* Main Hero Content - Enhanced with Motion */}
+      <div className="relative z-20 text-center px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto pt-20 sm:pt-24 lg:pt-28">
+        <motion.div
+          initial={{ y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 1.2, ease: "easeOut" }}
+          className="mb-2 sm:mb-4"
+        >
+          
+          {/* TravLin Logo and Branding - Enhanced with hover effect */}
+          <div className="relative mb-1 sm:mb-2">
+            {/* TravLin Logo - Clean Direct Display */}
+            <motion.div 
+              className="flex justify-center mb-4"
+              whileHover={{ scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 1, delay: 0.2 }}
+                className="flex items-center justify-center"
               >
-                Explore • Dream • Discover
-              </p>
-            </div>
+                <ImageWithFallback
+                  src="https://res.cloudinary.com/dgpwz1nqr/image/upload/v1759070964/2025_Landscape_on_clear_logo_with_blue_circle_kxfi4l.png"
+                  alt="TravLin Travel - Your Travel Specialists"
+                  className="h-32 w-auto sm:h-40 md:h-48 lg:h-56 xl:h-64 object-contain hover:scale-105 transition-transform duration-300"
+                  style={{ 
+                    filter: 'drop-shadow(0 6px 20px rgba(0,0,0,0.4))',
+                    maxWidth: '90vw'
+                  }}
+                  onLoad={() => console.log('✅ TravLin HERO landscape logo loaded successfully!')}
+                />
+              </motion.div>
+            </motion.div>
+            
+            {/* TravLin? Where next? - Enhanced with stagger animation */}
+            <motion.div 
+              className="text-center mt-2 sm:mt-4 lg:mt-6"
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 1, delay: 0.5 }}
+            >
+              <div
+                className="text-shadow-extra"
+                style={{ 
+                  fontSize: 'clamp(1.6rem, 4.5vw, 2.8rem)',
+                  fontWeight: '600',
+                  lineHeight: '1.1',
+                  letterSpacing: '0.02em'
+                }}
+              >
+                <motion.span 
+                  style={{ color: 'var(--white)' }}
+                  initial={{ x: -50, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ duration: 0.8, delay: 0.7 }}
+                >
+                  TravLin?
+                </motion.span>
+                <span style={{ color: 'var(--white)', margin: '0 0.5rem' }}> </span>
+                <motion.span 
+                  style={{ color: 'var(--brand-yellow)' }}
+                  initial={{ x: 50, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ duration: 0.8, delay: 0.9 }}
+                >
+                  Where next?
+                </motion.span>
+              </div>
+            </motion.div>
           </div>
           
-          {/* CTA and Menu Button - ALL SCREEN SIZES */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            <button
-              className="px-2 py-2 sm:px-3 sm:py-2 lg:px-4 lg:py-3 xl:px-6 xl:py-3 square-button-force font-bold uppercase tracking-wide text-xs lg:text-sm transition-all duration-300 shadow-lg min-h-[40px] lg:min-h-[44px] touch-manipulation"
+          {/* Main Description - Enhanced */}
+          <motion.div 
+            className="mb-6 sm:mb-8"
+            initial={{ y: 30, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 1, delay: 1.1 }}
+          >
+            <p className="text-white/90 max-w-4xl mx-auto leading-relaxed text-shadow" style={{ fontSize: 'clamp(1rem, 2.5vw, 1.25rem)' }}>
+              Join us on unforgettable journeys—discover new wonders, forge meaningful connections, <br className="hidden sm:block" />
+              and let every adventure enrich your soul with lasting memories.
+            </p>
+          </motion.div>
+        </motion.div>
+        
+        {/* Call-to-Action Button - Enhanced with Motion */}
+        <motion.div 
+          className="mb-16 sm:mb-20"
+          initial={{ y: 50, opacity: 0, scale: 0.9 }}
+          animate={{ y: 0, opacity: 1, scale: 1 }}
+          transition={{ duration: 1, delay: 1.3 }}
+        >
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <TravLinButton 
+              variant="orange"
+              size="reduced" 
+              onClick={scrollToNextSection}
+              className="shadow-2xl square-button-force"
               style={{
-                backgroundColor: 'var(--brand-orange)',
-                color: 'white',
-                border: 'none'
+                border: '2px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: '4px',
+                minHeight: '38px',
+                paddingTop: '0.5rem',
+                paddingBottom: '0.5rem'
               }}
-              onClick={handlePhoneClick}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--brand-orange-dark)';
-                if (window.innerWidth >= 1024) {
-                  e.currentTarget.style.transform = 'scale(1.05)';
-                  e.currentTarget.style.boxShadow = '0 8px 32px rgba(237, 125, 49, 0.4)';
-                }
+                e.currentTarget.style.boxShadow = '0 20px 40px rgba(237, 125, 49, 0.5), 0 8px 20px rgba(0, 0, 0, 0.3)';
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.35)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--brand-orange)';
-                if (window.innerWidth >= 1024) {
-                  e.currentTarget.style.transform = 'scale(1)';
-                  e.currentTarget.style.boxShadow = '0 4px 20px rgba(237, 125, 49, 0.3)';
-                }
+                e.currentTarget.style.boxShadow = '0 8px 30px rgba(0, 0, 0, 0.3)';
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
               }}
             >
-              <Phone className="w-4 h-4 lg:w-5 lg:h-5 text-white" style={{ fill: 'white', stroke: 'white', strokeWidth: '2px' }} />
-            </button>
-            
-            <button 
-              className={`
-                ${isMobileMenuOpen ? 'p-2 lg:p-2' : 'p-2 lg:p-3'} rounded-md transition-all duration-300 min-h-[48px] min-w-[48px] lg:min-h-[52px] lg:min-w-[52px] 
-                touch-manipulation flex items-center justify-center border-2 cursor-pointer
-                ${isMobileMenuOpen 
-                  ? 'bg-yellow-400/15 border-transparent text-yellow-400 shadow-md' 
-                  : 'hover:bg-white/8 border-transparent text-white hover:border-white/15'
-                }
-              `}
-              onClick={toggleMobileMenu}
-              style={{
-                WebkitTapHighlightColor: 'transparent',
-                userSelect: 'none',
-                WebkitUserSelect: 'none'
-              }}
-            >
-              {isMobileMenuOpen ? (
-                <X 
-                  className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-yellow-400 drop-shadow-lg pointer-events-none" 
-                  strokeWidth={3}
-                  style={{ 
-                    filter: 'drop-shadow(0 0 15px #FFC000) drop-shadow(0 0 8px #FFC000)'
-                  }} 
-                />
-              ) : (
-                <Menu 
-                  className={`w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 drop-shadow-md pointer-events-none ${
-                    (isScrolled || forceBlue) ? 'text-white' : 'text-yellow-400'
-                  }`} 
-                  strokeWidth={2}
-                />
-              )}
-            </button>
-          </div>
-        </div>
-
-        {/* Hamburger Menu - Clean Dropdown Only */}
-        {isMobileMenuOpen && (
-            <div 
-              className="mobile-menu-dropdown absolute top-full right-4 bg-gray-900 border border-white/20 shadow-xl max-h-[calc(100vh-6rem)] overflow-y-auto rounded-lg mt-2"
-              style={{ 
-                width: '250px', 
-                maxWidth: 'calc(100vw - 2rem)',
-                zIndex: 9996,
-                backgroundColor: 'rgba(17, 24, 39, 0.95)',
-                backdropFilter: 'blur(8px)'
-              }}
-            >
-              <nav className="flex flex-col p-4 space-y-1">
-                {navigationItems.map((item) => (
-                  <div key={item.name} className="border-b border-white/10 last:border-b-0">
-                    <button
-                      onClick={() => handleNavClick(item.href)}
-                      className="font-medium uppercase tracking-wide text-sm transition-all duration-300 py-3 text-left touch-manipulation w-full text-white hover:text-yellow-400 nav-link"
-                      style={{ 
-                        color: '#FFFFFF',
-                        transition: 'all 0.3s ease'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.color = 'var(--brand-yellow)'
-                        e.currentTarget.style.textShadow = '0 0 8px rgba(255, 192, 0, 0.5)'
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.color = '#FFFFFF'
-                        e.currentTarget.style.textShadow = 'none'
-                      }}
-                    >
-                      {item.name}
-                    </button>
-                  </div>
-                ))}
-              </nav>
-            </div>
-        )}
+              START YOUR JOURNEY
+            </TravLinButton>
+          </motion.div>
+        </motion.div>
       </div>
       
-      {/* Scroll Progress Indicator */}
-      <div 
-        className="absolute bottom-0 left-0 h-1 bg-gradient-to-r from-orange-500 via-yellow-500 to-blue-500 transition-all duration-300 ease-out" 
-        style={{ width: `${scrollProgress}%` }} 
-      />
-    </header>
+      {/* Bottom Row - Location Chip and Scroll Arrow on Same Line */}
+      <div className="absolute bottom-4 sm:bottom-6 left-0 right-0 flex justify-between items-center px-3 sm:px-4 z-30">
+        
+        {/* Enhanced Location Chip - Left Side */}
+        <motion.div 
+          initial={{ x: -100, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 1, delay: 1.5 }}
+          whileHover={{ scale: 1.05 }}
+        >
+          <div className="inline-flex items-center gap-2 bg-white/18 backdrop-blur-md border border-white/30 rounded-xl px-3 sm:px-4 py-2 sm:py-3 shadow-xl max-w-[calc(50vw-60px)] sm:max-w-none transition-all duration-300 hover:bg-white/25">
+            <MapPin className="w-4 sm:w-5 h-4 sm:h-5 text-white flex-shrink-0" />
+            <span className="text-white font-medium text-sm sm:text-base truncate">
+              <span className="hidden sm:inline">Azure Waters, Paradise</span>
+              <span className="sm:hidden">Azure Paradise</span>
+            </span>
+          </div>
+        </motion.div>
+
+        {/* Enhanced Scroll Indicator - Right Side */}
+        <motion.div 
+          initial={{ y: 50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 1, delay: 1.7 }}
+        >
+          <motion.div 
+            className="bg-white/22 backdrop-blur-md rounded-full p-3 sm:p-4 touch-manipulation cursor-pointer transition-all duration-300 hover:bg-white/30 shadow-lg"
+            onClick={scrollToNextSection}
+            animate={{
+              y: [0, -10, 0]
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            <ChevronDown className="w-6 sm:w-7 h-6 sm:h-7 text-white" />
+          </motion.div>
+        </motion.div>
+      </div>
+    </section>
   )
 }
