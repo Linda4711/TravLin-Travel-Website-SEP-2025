@@ -23,15 +23,24 @@ export default function Header({ onNavigateToServices, onNavigateToCruises, onNa
   const [scrollProgress, setScrollProgress] = useState(0)
 
   
-  const handlePhoneClick = () => {
+  const handlePhoneClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    
     const phoneNumber = '61 415 355 851'
     const displayNumber = '+61 415 355 851'
     const telNumber = 'tel:+61415355851'
     
+    console.log('📞 Header phone button clicked!')
+    
     // Try to open dialer first (mobile-friendly)
-    if (window.location.protocol === 'https:' || window.location.hostname === 'localhost') {
+    try {
       window.location.href = telNumber;
-    } else {
+      toast.success(`📞 Calling: ${displayNumber}`, {
+        description: 'Linda Forster - Your Travel Expert',
+        duration: 3000,
+      })
+    } catch (error) {
       // Fallback - copy to clipboard
       navigator.clipboard.writeText(displayNumber).then(() => {
         toast.success(`📞 Phone number copied: ${displayNumber}`, {
@@ -336,7 +345,10 @@ export default function Header({ onNavigateToServices, onNavigateToCruises, onNa
               style={{
                 backgroundColor: 'var(--brand-orange)',
                 color: 'white',
-                border: 'none'
+                border: 'none',
+                pointerEvents: 'auto',
+                zIndex: 100,
+                position: 'relative'
               }}
               onClick={handlePhoneClick}
               onMouseEnter={(e) => {
